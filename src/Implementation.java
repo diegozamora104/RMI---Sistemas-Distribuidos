@@ -1,8 +1,8 @@
-// Java program to implement the Interface interface
+// Java program to implement the EchoInterface interface
 import java.rmi.*;
 import java.rmi.server.*;
 
-public class Implementation extends UnicastRemoteObject implements Interface {
+public class Implementation extends UnicastRemoteObject implements EchoInterface {
 
     // Default constructor to throw RemoteException
     // from its parent constructor

@@ -8,7 +8,7 @@ public class Client
         try
         {
             // lookup method to find reference of remote object
-            Interface access = (Interface) Naming.lookup("rmi://localhost:1900" + "/geeksforgeeks");
+            EchoInterface access = (EchoInterface) Naming.lookup("rmi://localhost:1900" + "/geeksforgeeks");
             answer = access.query(value);
 
             System.out.println("Article on " + value + " " + answer+" at GeeksforGeeks");

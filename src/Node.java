@@ -1,58 +1,60 @@
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Node {
+public class Node implements Serializable {
 
-    private int ID;
-    private int i; // i : Initiator
-    private int c; // c : Committed
-    private int n; // n : Number of messages
-    private int o; // o : Origin node
-    private List<Integer> neighborhood;
+    private static int _node_id;
+    private static boolean _initiator; // _initiator : Initiator node
+    private static boolean _engaged; // _engaged : Visited node
+    private static int _num_messages; // _num_messages : Number of messages
+    private static int _origin; // _origin : Origin node
+    private static List<Integer> _neighborhood;
 
-    public Node(int ID, int initiator, int origin){
-        this.ID = ID;
-        this.i = initiator;
-        this.c = 0;
-        this.n = 0;
-        this.o = origin;
-        this.neighborhood = new ArrayList<Integer>();   // hay que agregar a los vecinos
+    public Node(int id, boolean initiator){
+        _node_id = id;
+        _initiator = initiator;
+        _engaged = false;
+        _num_messages = 0;
+        _origin = -1;
+        _neighborhood = new ArrayList<>();   // Hay que agregar a los vecinos
     }
 
-// SUPUESTO: NO hay que inicializar tooooodos los nodos, incluyendo los vecinos de nodos ya inicializados
+    // SUPUESTO: NO hay que inicializar todos los nodos, incluyendo los vecinos de nodos ya inicializados
     // public send(vecinos,explorer){}
 
     // GETTERS
-    public int getid(){
-        return this.ID;
+    public int getId(){
+        return _node_id;
     }
-    public int getCommitted(){
-        return this.c;
+    public boolean getEngaged(){
+        return _engaged;
     }
-    public int getInitiator(){
-        return this.i;
+    public boolean getInitiator(){
+        return _initiator;
     }
-    public int getNumber(){
-        return this.n;
+    public int getMessages(){
+        return _num_messages;
     }
     public int getOrigin(){
-        return this.o;
+        return _origin;
     }
-    public List<Integer> getNeighbot(){
-        return this.neighborhood;
+    public List<Integer> getNeighborhood(){
+        return _neighborhood;
     }
 
     //SETTERS
     public void setCommitted(int c){
-        this.ID = c;
+        _node_id = c;
     }
     public void setNumber(int n){
-        this.ID = n;
-    }public void setOrigin(int o){
-        this.ID = o;
+        _node_id = n;
+    }
+    public void setOrigin(int o){
+        _node_id = o;
     }
     public void newNeighbor(int IdNeighbor){
-        this.neighborhood.add(IdNeighbor);
+        _neighborhood.add(IdNeighbor);
     }
 }
 

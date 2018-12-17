@@ -9,7 +9,7 @@ public class Server
         {
             // Create an object of the interface
             // implementation class
-            Interface obj = new Implementation();
+            EchoInterface obj = new Implementation();
 
             // rmiregistry within the server JVM with
             // port number 1900
