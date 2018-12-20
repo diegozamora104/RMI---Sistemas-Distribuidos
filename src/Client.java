@@ -1,22 +1,32 @@
-//program for client application
-import java.rmi.*;
-public class Client
-{
-    public static void main(String args[])
-    {
-        String answer,value="Reflection in Java";
-        try
-        {
-            // lookup method to find reference of remote object
-            EchoInterface access = (EchoInterface) Naming.lookup("rmi://localhost:1900" + "/geeksforgeeks");
-            answer = access.query(value);
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
 
-            System.out.println("Article on " + value + " " + answer+" at GeeksforGeeks");
-            System.out.println(access.sendMessage("Client Message"));
-        }
-        catch(Exception ae)
-        {
-            System.out.println(ae);
+public class Client {
+
+    private Client() {}
+
+    public static void main(String[] args) {
+        try {
+
+            // Looking up the registry for the remote object
+            Registry reg = LocateRegistry.getRegistry("localhost");
+
+            for (String nodeName : reg.list()){
+                INode node = (INode) reg.lookup(nodeName);
+                System.out.print("\n\nNode: " + String.valueOf(node.getId()) + "\n" );
+                for(String neighbor : node.getNeighborhood()){
+                    System.out.print("My neighbor:" + neighbor + "\n");
+                }
+            }
+
+
+            // Calling the remote method using the obtained object
+            //System.out.println("Server Answer: " + stub.printMsg());
+
+            // System.out.println("Remote method invoked");
+        } catch (Exception e) {
+            System.err.println("Client exception: " + e.toString());
+            e.printStackTrace();
         }
     }
 }
