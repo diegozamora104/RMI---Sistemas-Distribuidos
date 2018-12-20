@@ -19,4 +19,6 @@ public interface INode extends Remote {
     void setOrigin(int o) throws RemoteException;
 
     //TODO Echo functions!
+
+    void firstWave() throws RemoteException;
 }

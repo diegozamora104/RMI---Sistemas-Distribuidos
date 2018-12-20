@@ -18,6 +18,21 @@ public class Server{
         //String adress;
 
         try {
+            if(args[0].equals("Start")){
+                Registry reg = LocateRegistry.getRegistry("localhost");
+                try {
+                    for (String nodeName : reg.list()){
+                        INode node = (INode) reg.lookup(nodeName);
+                        System.out.print("\n\nNode: " + String.valueOf(node.getId()) + "\n" );
+                        for(String neighbor : node.getNeighborhood()){
+                            System.out.print("My neighbor:" + neighbor + "\n");
+                        }
+                    }
+                } catch (NotBoundException e) {
+                    e.printStackTrace();
+                }
+            }
+
             if (args.length >= 1) {
                 pid = Integer.parseInt(args[0]);
 
@@ -49,20 +64,6 @@ public class Server{
             NodeBody node = new NodeBody(pid, Neighborhood, initiator);
             Registry reg = LocateRegistry.getRegistry(registry);
             reg.bind(String.valueOf(pid),node);
-
-            if (initiator){
-
-                //Se envia el mensaje explorar al vecino del nodo iniciador
-                for (String nodeName : Neighborhood){
-                    try{
-                    INode stub = (INode) reg.lookup(nodeName);
-                    System.out.print("\nTransmitting to the node: " + String.valueOf(stub.getId()) + "\n" );
-                    stub.firstWave(pid);
-                    } catch (NotBoundException e){
-                        e.printStackTrace();
-                    }
-                }
-            }
 
         } catch (AlreadyBoundException e) {
 

@@ -62,6 +62,11 @@ public class NodeBody extends UnicastRemoteObject implements INode {
         _node_id = o;
     }
 
+    @Override
+    public void firstWave() throws RemoteException {
+
+    }
+
     /*@Override
     public void run() {
 
