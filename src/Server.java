@@ -29,10 +29,13 @@ public class Server{
                         for (String nodeName : reg.list()) {
                             INode node = (INode) reg.lookup(nodeName);
                             node.active();
-                            /*System.out.print("\n\nTransmitted from node: " + String.valueOf(node.getId()) + "\n");
-                            for (String neighbor : node.getNeighborhood()) {
-                                System.out.print("My neighbor:" + neighbor + "\n");
-                            }*/
+
+                            if(node.getInitiator()) {
+
+                                for (String neighbor : node.getNeighborhood()) {
+                                    node.firstWave(Integer.parseInt(neighbor));
+                                }
+                            }
                         }
 
                     } catch (NotBoundException e) {

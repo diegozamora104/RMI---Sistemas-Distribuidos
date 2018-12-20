@@ -21,7 +21,8 @@ public interface INode extends Remote {
     //TODO Echo functions!
 
     void active() throws RemoteException;
-    void firstWave(NodeBody node) throws RemoteException;
-    boolean echo(NodeBody node) throws RemoteException;
+    void firstWave(int pid) throws RemoteException;
+    boolean echo(String origin) throws RemoteException;
     void election(String originPid , String electedPid) throws RemoteException;
+    void transmitted() throws RemoteException;
 }
