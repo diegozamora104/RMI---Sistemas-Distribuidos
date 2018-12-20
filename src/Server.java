@@ -3,6 +3,7 @@ import java.rmi.AlreadyBoundException;
 import java.rmi.NotBoundException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -17,38 +18,63 @@ public class Server{
         //String file;
         //String adress;
 
+        Registry reg = LocateRegistry.getRegistry("localhost");
+
         try {
-            if(args[0].equals("Start")){
-                Registry reg = LocateRegistry.getRegistry("localhost");
-                try {
-                    for (String nodeName : reg.list()){
-                        INode node = (INode) reg.lookup(nodeName);
-                        System.out.print("\n\nNode: " + String.valueOf(node.getId()) + "\n" );
-                        for(String neighbor : node.getNeighborhood()){
-                            System.out.print("My neighbor:" + neighbor + "\n");
+            switch (args[0]) {
+                case "Start":
+
+                    try {
+
+                        for (String nodeName : reg.list()) {
+                            INode node = (INode) reg.lookup(nodeName);
+                            node.active();
+                            /*System.out.print("\n\nTransmitted from node: " + String.valueOf(node.getId()) + "\n");
+                            for (String neighbor : node.getNeighborhood()) {
+                                System.out.print("My neighbor:" + neighbor + "\n");
+                            }*/
                         }
+
+                    } catch (NotBoundException e) {
+
+                        e.printStackTrace();
+
                     }
-                } catch (NotBoundException e) {
-                    e.printStackTrace();
-                }
-            }
 
-            if (args.length >= 1) {
-                pid = Integer.parseInt(args[0]);
+                    break;
+                case "Stop":
 
-                if (args.length == 2) {
-                    _neighborhood = args[1].split(",");
-                }
+                    try {
+                        for (String nodeName : reg.list()) {
+                            INode node = (INode) reg.lookup(nodeName);
+                            reg.unbind(String.valueOf(node.getId()));
+                        }
+                    } catch (NotBoundException e) {
+                        e.printStackTrace();
+                    }
 
-                if(args.length == 3){
-                    initiator = args[2].equals("true");
-                }
+                    System.out.print("EchoAlgorithm stopped!");
+                    System.exit(0);
 
-            } else {
+                default:
 
-                System.out.println("Usage: java EchoAlgorithm <pid> <neighborhood> <initiator?> <encrypted_file> <ip_adress>");
-                System.exit(1);
+                    if (args.length == 3) {
+                        pid = Integer.parseInt(args[0]);
 
+                        _neighborhood = args[1].split(",");
+
+                        initiator = args[2].equals("true");
+
+                    } else {
+
+                        System.out.println("Usage: java EchoAlgorithm <pid> <neighborhood> <initiator?> <encrypted_file> <ip_adress>");
+                        System.exit(1);
+
+                    }
+
+                    //System.exit(0);
+
+                    break;
             }
         }catch (NumberFormatException nfe){
 
@@ -62,7 +88,7 @@ public class Server{
 
             ArrayList<String> Neighborhood = new ArrayList<>(Arrays.asList(_neighborhood));
             NodeBody node = new NodeBody(pid, Neighborhood, initiator);
-            Registry reg = LocateRegistry.getRegistry(registry);
+            //Registry reg = LocateRegistry.getRegistry(registry);
             reg.bind(String.valueOf(pid),node);
 
         } catch (AlreadyBoundException e) {

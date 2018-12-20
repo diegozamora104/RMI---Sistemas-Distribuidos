@@ -9,7 +9,7 @@ public class Client {
         try {
 
             // Looking up the registry for the remote object
-            /*Registry reg = LocateRegistry.getRegistry("localhost");
+            Registry reg = LocateRegistry.getRegistry("localhost");
 
             for (String nodeName : reg.list()){
                 INode node = (INode) reg.lookup(nodeName);
@@ -17,7 +17,7 @@ public class Client {
                 for(String neighbor : node.getNeighborhood()){
                     System.out.print("My neighbor:" + neighbor + "\n");
                 }
-            }*/
+            }
 
 
             // Calling the remote method using the obtained object

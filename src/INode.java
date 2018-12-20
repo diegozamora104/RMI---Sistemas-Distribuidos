@@ -8,17 +8,20 @@ public interface INode extends Remote {
     int getId() throws RemoteException;
     boolean getEngaged() throws RemoteException;
     boolean getInitiator() throws RemoteException;
-    int getMessages() throws RemoteException;
+    int getNumMessages() throws RemoteException;
     int getOrigin() throws RemoteException;
     ArrayList<String> getNeighborhood() throws RemoteException;
 
 
     //SETTERS
-    void setEngaged(int c) throws RemoteException;
-    void setNumber(int n) throws RemoteException;
-    void setOrigin(int o) throws RemoteException;
+    void setEngaged(Boolean value) throws RemoteException;
+    void setNumMessages(int n) throws RemoteException;
+    void setOrigin(int origin) throws RemoteException;
 
     //TODO Echo functions!
 
-    void firstWave() throws RemoteException;
+    void active() throws RemoteException;
+    void firstWave(NodeBody node) throws RemoteException;
+    boolean echo(NodeBody node) throws RemoteException;
+    void election(String originPid , String electedPid) throws RemoteException;
 }

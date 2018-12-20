@@ -1,4 +1,7 @@
+import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 
@@ -35,7 +38,7 @@ public class NodeBody extends UnicastRemoteObject implements INode {
         return _initiator;
     }
     @Override
-    public int getMessages() throws RemoteException {
+    public int getNumMessages() throws RemoteException {
         return _num_messages;
     }
     @Override
@@ -50,20 +53,150 @@ public class NodeBody extends UnicastRemoteObject implements INode {
 
     //SETTERS
     @Override
-    public void setEngaged(int c) throws RemoteException {
-        _node_id = c;
+    public void setEngaged(Boolean value) throws RemoteException {
+        _engaged = value;
     }
     @Override
-    public void setNumber(int n) throws RemoteException {
-        _node_id = n;
+    public void setNumMessages(int n) throws RemoteException {
+        _num_messages = n;
     }
     @Override
-    public void setOrigin(int o) throws RemoteException {
-        _node_id = o;
+    public void setOrigin(int origin) throws RemoteException {
+        _origin = origin;
     }
 
     @Override
-    public void firstWave() throws RemoteException {
+    public void active() throws RemoteException {
+
+        System.out.println("Starting algorithm in node: " + _node_id);
+
+    }
+
+
+
+
+    @Override
+    public void firstWave(NodeBody node) throws RemoteException {
+
+        Registry reg = LocateRegistry.getRegistry();
+
+        if (!node.getEngaged()){
+            System.out.println("Explorer message from node: " + String.valueOf(node.getId()) + " established as origin.");
+            node.setEngaged(true);
+            node.setOrigin(node.getId());
+            for (String neighbor : node.getNeighborhood()) {
+
+
+
+                if (!neighbor.equals(String.valueOf(node.getOrigin()))){
+                    try{
+
+                        INode stub = (INode) reg.lookup(neighbor);
+
+                        System.out.println("Sending a message to: " + neighbor);
+
+                        stub.firstWave(object);
+
+                    } catch (NotBoundException e){
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+        else {
+            System.out.println("Explorer message from node: " + node.getOrigin() + " received and extinguished");
+        }
+
+        node.setNumMessages(node.getNumMessages() + 1);
+
+        if (node.getNumMessages() == node.getNeighborhood().size()){
+            System.out.println("Sending a echo message from node:" + node.getOrigin());
+
+            try {
+                INode stub2 = (INode) reg.lookup(String.valueOf(node.getOrigin()));
+
+                //stub2.echo(object);
+
+            } catch (NotBoundException e){
+                e.printStackTrace();
+            }
+        }
+
+    }
+
+    @Override
+    public boolean echo(NodeBody node) throws RemoteException {
+
+        System.out.println("Echo message from node: " + node.getId());
+
+        node.setNumMessages(node.getNumMessages() + 1);
+        Registry reg = LocateRegistry.getRegistry();
+
+        if ( node.getNumMessages() == node.getNeighborhood().size()){
+
+            node.setEngaged(false);
+
+            if (node.getInitiator()){
+
+                System.out.println("Echo Algorithm finished!");
+                System.out.println("Elected node: " + node.getId());
+
+
+                INode stub;
+                for (String neighbor : node.getNeighborhood()) {
+                    try{
+                        System.out.println("Responding to node: " + node.getId());
+                        stub = (INode) reg.lookup(neighbor);
+                        stub.election(neighbor , String.valueOf(node.getId()));
+
+
+                        //Aqui deberia ir el consultar al server
+
+                    } catch (NotBoundException e){
+                        e.printStackTrace();
+                    }
+                }
+
+
+                return true;
+
+            }
+            else {
+
+                INode stub;
+                try{
+                    stub = (INode) reg.lookup(String.valueOf(node.getOrigin()));
+                    //stub.echo(object);
+                } catch (NotBoundException e){
+                    e.printStackTrace();
+                }
+            }
+
+        }
+
+    }
+
+    @Override
+    public void election(String originPid, String electedPid) throws RemoteException {
+
+        /*if (!representante_establecido){
+            representante_establecido = true;
+            proceso_representante = id_representante;
+            System.out.println("El Proceso Representante es " +  id_representante);
+            for (int i = 0; i < nodos_vecinos.size(); i++){
+                Registry reg = LocateRegistry.getRegistry();
+                EchoInterface stub;
+                if (!nodos_vecinos.get(i).equals(nodoOrigen)){
+                    try{
+                        stub = (EchoInterface) reg.lookup(nodos_vecinos.get(i));
+                        System.out.println("Enviando ID del Proceso Representante a " + nodos_vecinos.get(i));
+                        stub.establecer_representante(nodoId ,  id_representante);
+                    } catch (NotBoundException e){
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }*/
 
     }
 
