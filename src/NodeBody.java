@@ -111,7 +111,6 @@ public class NodeBody extends UnicastRemoteObject implements INode{
             System.out.println("Lo siento, nodo: " + pid + "ya estoy comprometido con: " + origin + " u-u");
         }
 
-        System.out.println("Contador de mensajes: " + num_messages);
         num_messages = num_messages + 1;
 
         if (num_messages == neighborhood.size()){
@@ -151,7 +150,6 @@ public class NodeBody extends UnicastRemoteObject implements INode{
                     String decipherText;
                     String textcipher = null;
                     InterfaceServer server = (InterfaceServer) Naming.lookup("//" + address + "/PublicKey");
-                    //Este try/catch es para leer el texto cifrado del archivo que damos como input
 
                     try{
                         BufferedReader brTexto = new BufferedReader(new FileReader(path));
