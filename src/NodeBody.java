@@ -86,7 +86,7 @@ public class NodeBody extends UnicastRemoteObject implements INode{
     @Override
     public void firstWave(int pid) throws RemoteException {
         if (!engaged){
-            System.out.println("Recibi un mensaje explorador de  "+ String.valueOf(pid));
+            System.out.println("I Received a message from node: "+ String.valueOf(pid));
             engaged = true;
             origin = pid;
             for (String neighbor : neighborhood) {
@@ -97,7 +97,7 @@ public class NodeBody extends UnicastRemoteObject implements INode{
 
                         INode stub = (INode) reg.lookup(neighbor);
 
-                        System.out.println("Le envio un mensaje a este tio: " + neighbor);
+                        System.out.println("Sending to the node: " + neighbor);
 
                         stub.firstWave(node_id);
 
@@ -108,13 +108,13 @@ public class NodeBody extends UnicastRemoteObject implements INode{
             }
         }
         else {
-            System.out.println("Lo siento, nodo: " + pid + "ya estoy comprometido con: " + origin + " u-u");
+            System.out.println("Node: " + pid + " engaged with: " + origin + ", therefore, the message is extinguished.");
         }
 
         num_messages = num_messages + 1;
 
         if (num_messages == neighborhood.size()){
-            System.out.println("Enviando un eco a :" + origin);
+            System.out.println("Sending a echo message: " + origin);
             Registry reg = LocateRegistry.getRegistry();
             try {
                 INode stub2 = (INode) reg.lookup(String.valueOf(origin));
@@ -131,9 +131,10 @@ public class NodeBody extends UnicastRemoteObject implements INode{
     @Override
     public boolean echo(String pid) throws RemoteException {
 
-        System.out.println("Recibi un eco de : " + pid);
+        System.out.println("I Received a echo message from node: " + pid);
 
         num_messages = num_messages + 1;
+        String decipheredText = null;
         Registry reg = LocateRegistry.getRegistry();
 
         if ( num_messages == neighborhood.size()){
@@ -146,18 +147,14 @@ public class NodeBody extends UnicastRemoteObject implements INode{
                 System.out.println("Elected node: " + String.valueOf(node_id));
 
                 try {
-
-                    String decipherText;
-                    String textcipher = null;
+                    String text_from_server = null;
                     InterfaceServer server = (InterfaceServer) Naming.lookup("//" + address + "/PublicKey");
 
                     try{
-                        BufferedReader brTexto = new BufferedReader(new FileReader(path));
-
-                        String sCurrentLine;
-
-                        while ((sCurrentLine = brTexto.readLine()) != null) {
-                            textcipher = sCurrentLine;
+                        BufferedReader buffer = new BufferedReader(new FileReader(path));
+                        String line;
+                        while ((line = buffer.readLine()) != null) {
+                            text_from_server = line;
                         }
 
                     } catch (IOException e) {
@@ -165,10 +162,8 @@ public class NodeBody extends UnicastRemoteObject implements INode{
                     }
 
                     String publicKey = server.getKey("grupo_5") ;
-                    System.out.println("Llave obtenida del server: "+ publicKey);
-                    System.out.println("Texto cifrado del server: "+ textcipher);
-                    decipherText = server.decipher("grupo_5", textcipher, publicKey );
-                    System.out.println("Texto descifrado del server: "+ decipherText);
+                    decipheredText = server.decipher("grupo_5", text_from_server, publicKey );
+                    System.out.println("Deciphered text: "+ decipheredText);
 
                 }catch(Exception e){
                     System.out.println(e);
@@ -179,16 +174,11 @@ public class NodeBody extends UnicastRemoteObject implements INode{
                     try{
                         System.out.println("Responding to node: " + neighbor);
                         stub = (INode) reg.lookup(neighbor);
-                        //stub.election(neighbor , String.valueOf(pid));
-
-
-                        //Aqui deberia ir el consultar al server
-
+                        stub.result(decipheredText, String.valueOf(node_id));
                     } catch (NotBoundException e){
                         e.printStackTrace();
                     }
                 }
-
 
                 return true;
 
@@ -210,27 +200,24 @@ public class NodeBody extends UnicastRemoteObject implements INode{
     }
 
     @Override
-    public void election(String originPid, String electedPid) throws RemoteException {
-
-        /*if (!representante_establecido){
-            representante_establecido = true;
-            proceso_representante = id_representante;
-            System.out.println("El Proceso Representante es " +  id_representante);
-            for (int i = 0; i < nodos_vecinos.size(); i++){
+    public void result(String deciphered_text, String electedPid) throws RemoteException {
+        if (engaged){
+            System.out.println("The elected node is: " + electedPid);
+            System.out.println("The deciphered text is: " + deciphered_text);
+            engaged = false;
+            for (String neighbor : neighborhood) {
                 Registry reg = LocateRegistry.getRegistry();
-                EchoInterface stub;
-                if (!nodos_vecinos.get(i).equals(nodoOrigen)){
+
+                if (!neighbor.equals(String.valueOf(origin))){
                     try{
-                        stub = (EchoInterface) reg.lookup(nodos_vecinos.get(i));
-                        System.out.println("Enviando ID del Proceso Representante a " + nodos_vecinos.get(i));
-                        stub.establecer_representante(nodoId ,  id_representante);
+                        INode stub = (INode) reg.lookup(neighbor);
+                        stub.result(deciphered_text, electedPid);
                     } catch (NotBoundException e){
                         e.printStackTrace();
                     }
                 }
             }
-        }*/
-
+        }
     }
 }
 

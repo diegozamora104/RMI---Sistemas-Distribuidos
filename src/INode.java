@@ -23,5 +23,5 @@ public interface INode extends Remote {
     void active() throws RemoteException;
     void firstWave(int pid) throws RemoteException;
     boolean echo(String origin) throws RemoteException;
-    void election(String originPid , String electedPid) throws RemoteException;
+    void result(String originPid , String electedPid) throws RemoteException;
 }
